@@ -209,7 +209,7 @@ class TaskDetailView(View):
     def post(self, request, task_id):
         task = Task.objects.get(id=task_id)
         form = CommentForm(request.POST)
-        breakpoint()
+        
         if form.is_valid():
             content = form.save(commit=False)
             content.commented_by = request.user
