@@ -1,6 +1,6 @@
 from django import forms
 
-from .models import Task, User, Comment
+from .models import Comment, Task, User
 
 
 class RegistrationForm(forms.ModelForm):
@@ -17,7 +17,7 @@ class RegistrationForm(forms.ModelForm):
 
     # applying placeholder for all the fields
     def __init__(self, *args, **kwargs):
-        super(RegistrationForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.fields["first_name"].widget.attrs[
             "placeholder"
         ] = "Enter First Name"  # applying the text in the placeholder
@@ -50,8 +50,8 @@ class MyTaskForm(forms.ModelForm):
         fields = (
             "title",
             "status",
-            
         )
+
 
 class CommentForm(forms.ModelForm):
     class Meta:

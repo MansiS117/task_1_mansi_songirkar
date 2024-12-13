@@ -21,7 +21,7 @@
   <div class="container py-5 h-100">
     <div class="row d-flex justify-content-center align-items-center h-100">
       <div class="col-md-12 col-xl-10">
-        
+
         <div class="card mask-custom">
           <div class="card-body p-4 text-white">
 
@@ -59,16 +59,16 @@
                   <td class="align-middle" style="color: black;">
                     <span>{{ task.status.capitalize }}</span>
                   </td>
-                  
+
                   <td colspan="5" class="align-middle" style="display: flex; justify-content: space-between; align-items: flex-end;">
-                    
+
                     <a href="{% url 'edit_task' task.id %}"><button style="background-color: orange; color: white;">Edit</button></a>
                    <form action="{% url 'delete_task' task.id %}" method="post">
                       {% csrf_token %}
                       <button style="background-color: red; color: white;">Delete</button>
                     </form>
                     <a href="{% url 'task_detail' task.id %}"><button style="background-color: blue; color: white;">View</button></a>
-                   
+
                   </td>
                 </tr>
                 {% endfor %}

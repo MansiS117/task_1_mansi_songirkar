@@ -1,12 +1,10 @@
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.shortcuts import redirect, render
-from django.utils import timezone
 from django.views import View
 
-from .forms import RegistrationForm, TaskForm, MyTaskForm, CommentForm
-from .models import Task, User, Comment
-from django.db.models import Q
+from .forms import CommentForm, MyTaskForm, RegistrationForm, TaskForm
+from .models import Comment, Task, User
 
 # Create your views here.
 
@@ -101,8 +99,7 @@ class TaskCreateView(View):
             task = form.save(commit=False)
             assigned_by = request.user
             assigned_to = User.objects.get(id=assigned_to)
-            
-            
+
             task = Task(
                 title=title,
                 description=description,
@@ -119,76 +116,79 @@ class TaskCreateView(View):
 
 
 class TaskEditView(View):
-    template_name = 'create_task.html'
-    def get(self,request, task_id):
-        task = Task.objects.get(id = task_id)
+    template_name = "create_task.html"
+
+    def get(self, request, task_id):
+        task = Task.objects.get(id=task_id)
         form = TaskForm(instance=task)
-        return render(request, self.template_name, {"form" : form})
+        return render(request, self.template_name, {"form": form})
 
     def post(self, request, task_id):
-        task = Task.objects.get(id = task_id)
-        form = TaskForm(request.POST, instance = task)
+        task = Task.objects.get(id=task_id)
+        form = TaskForm(request.POST, instance=task)
         if form.is_valid():
             form.save()
-            return redirect('home')
+            return redirect("home")
         messages.error(request, "Try again")
-        return render(request,self.template_name, {"form" : form})
+        return render(request, self.template_name, {"form": form})
 
 
 class TaskDeleteView(View):
-    template_name = 'index.html'
+    template_name = "index.html"
+
     def post(self, request, task_id):
-        task = Task.objects.get(id = task_id)
+        task = Task.objects.get(id=task_id)
         if task:
             task.delete()
             messages.success(request, "Task deleted successfully")
         else:
             messages.error(request, "item does not exist")
-        return redirect('home')
-        
-       
+        return redirect("home")
+
+
 class MyTaskView(View):
     template_name = "my_task.html"
+
     def get(self, request):
         if request.user.is_authenticated:
-            tasks = Task.objects.filter(assigned_to = request.user)
-            context = {
-                "tasks" : tasks
-            }
+            tasks = Task.objects.filter(assigned_to=request.user)
+            context = {"tasks": tasks}
             return render(request, self.template_name, context)
         messages.error(request, "You need to log in ")
         return render(request, self.template_name)
-    
+
+
 class UpdateMyTaskView(View):
     template_name = "update_mytask.html"
+
     def get(self, request, task_id):
         if request.user.is_authenticated:
-            task = Task.objects.get(id = task_id)
+            task = Task.objects.get(id=task_id)
             if task:
-                form = MyTaskForm(instance = task)
-                return render(request, self.template_name, {"form" : form})
+                form = MyTaskForm(instance=task)
+                return render(request, self.template_name, {"form": form})
             messages.error(request, "Task not found")
-            return redirect('home')
+            return redirect("home")
         messages.error(request, "You need to login")
-        return redirect('home')
-    
+        return redirect("home")
+
     def post(self, request, task_id):
         if request.user.is_authenticated:
-            task = Task.objects.get(id =task_id)
+            task = Task.objects.get(id=task_id)
             if task:
-                form = MyTaskForm(request.POST, instance = task)
+                form = MyTaskForm(request.POST, instance=task)
                 if form.is_valid():
-                    task.status = request.POST.get('status') 
+                    task.status = request.POST.get("status")
                     if task.status == "completed":
                         task.complete = True
                     else:
                         task.complete = False
                     task.save()
-                return redirect('my_task')
+                return redirect("my_task")
             messages.error(request, "Task not found")
 
         messages.error(request, "You need to login")
-        return redirect('home')
+        return redirect("home")
 
 
 class TaskDetailView(View):
@@ -202,14 +202,13 @@ class TaskDetailView(View):
             "task": task,
             "comments": comments,
             "form": form,
-
         }
         return render(request, self.template_name, context)
-    
+
     def post(self, request, task_id):
         task = Task.objects.get(id=task_id)
         form = CommentForm(request.POST)
-        
+
         if form.is_valid():
             content = form.save(commit=False)
             content.commented_by = request.user
